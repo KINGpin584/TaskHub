@@ -1,0 +1,13 @@
+# System & Package Requirements for the Application
+
+.NET 9.0 SDK
+
+NuGet Packages:
+  - Microsoft.AspNetCore.SignalR 1.2.0
+  - Microsoft.EntityFrameworkCore 8.0.2
+  - Pomelo.EntityFrameworkCore.MySql 8.0.2
+  - Microsoft.EntityFrameworkCore.Design 8.0.2
+  - Microsoft.EntityFrameworkCore.Tools 8.0.2
+
+Project Dependency:
+  - TaskManagementSystem.Core (See the project reference in your csproj file)

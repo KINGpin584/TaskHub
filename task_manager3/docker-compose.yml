@@ -1,0 +1,78 @@
+# Docker Compose configuration
+services:
+  # Database Service
+  db:
+    image: mysql:8.0
+    container_name: taskmanagement-db
+    environment:
+    
+      - MYSQL_DATABASE=taskmanagement
+      - MYSQL_ROOT_PASSWORD=123
+      - MYSQL_ROOT_HOST=%  # Allow connections from any host
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p123"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - taskmanagement-network
+    command: --default-authentication-plugin=mysql_native_password
+
+  # Migration Service
+  migration:
+    image: mcr.microsoft.com/dotnet/sdk:9.0
+    container_name: taskmanagement-migration
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    working_dir: /app
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=db;Database=taskmanagement;User=root;Password=123;AllowPublicKeyRetrieval=true;
+    networks:
+      - taskmanagement-network
+    command: >
+      sh -c '
+        dotnet restore &&
+        dotnet tool install --global dotnet-ef &&
+        export PATH="$PATH:/root/.dotnet/tools" &&
+        dotnet ef database update --project TaskManagementSystem.API/TaskManagementSystem.API.csproj
+      '
+
+  # API Service
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: taskmanagement-api
+    ports:
+      - "5087:80"
+    environment:
+      - ASPNETCORE_URLS=http://+:80  # Add this line
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=db;Database=taskmanagement;User=root;Password=123;AllowPublicKeyRetrieval=true;
+    depends_on:
+      - migration
+    networks:
+      - taskmanagement-network
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+
+# Volumes configuration
+volumes:
+  mysql_data:
+    name: taskmanagement-mysql-data
+
+# Networks configuration
+networks:
+  taskmanagement-network:
+    name: taskmanagement-network
+    driver: bridge

@@ -47,7 +47,8 @@ The `req.txt` file lists all external system and package requirements. Use it as
 (Note: The NuGet packages are restored via `dotnet restore`; use `req.txt` to verify you have the appropriate system dependencies.)
 
 ## Docker Setup for Backend
-
+--first add -> dotnet ef migrations add InitialCreate
+Then wecan go ahead:
 To compile and run the backend Docker container using Docker Compose, follow these steps:
 
 1. Bring down any running services: docker-compose down

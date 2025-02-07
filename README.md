@@ -20,6 +20,14 @@ This project is built using .NET 9.0 and utilizes several NuGet packages to work
   • Microsoft.EntityFrameworkCore.Design (v8.0.2)  
   • Microsoft.EntityFrameworkCore.Tools (v8.0.2)
 
+  -**Make Migrations and Database update to Mysql_server**
+  dotnet ef migrations add <MigrationName> --project <YourDataProject> --startup-project <YourStartupProject>
+  dotnet ef database update --project <YourDataProject> --startup-project <YourStartupProject>
+  dotnet build
+  dotnet run -{to run the server on local host}
+
+   
+
 - **Project Dependency**  
   • TaskManagementSystem.Core 
 
